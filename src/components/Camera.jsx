@@ -52,6 +52,18 @@ const Camera = () => {
   //       </div>
   //     </div>
   //   );
+  let vid = [];
+  navigator.mediaDevices.enumerateDevices().then((data) => {
+    let deviceIds = data
+      .filter((e) => e.kind === "videoinput")
+      .map((e) => vid.push(e.deviceId));
+
+    console.log("navigoter data", vid);
+  });
+
+  const [openBackCamera, setOpenBackCamera] = useState(false);
+  let [camIndex, setCamIndex] = useState(0);
+
   const [selectedCamera, setSelectedCamera] = useState("user");
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const videoRef = useRef({});
@@ -61,6 +73,8 @@ const Camera = () => {
 
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
+
+    setCamIndex((index + 1) % vid.length);
   };
 
   const handleAspectRatioChange = (newAspectRatio) => {
@@ -82,8 +96,8 @@ const Camera = () => {
   const constraints = {
     video: {
       //   facingMode: selectedCamera,
-        //  facingMode: { exact: "user" },
-      facingMode: { exact: "environment" },
+      //  facingMode: { exact: "user" },
+      //   facingMode: { exact: "user" },
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
   };
@@ -92,22 +106,27 @@ const Camera = () => {
     setImages((prev) => prev.filter((e) => e._id !== id));
   };
 
-  //   useEffect(() => {
-  //     // navigator.mediaDevices.enumerateDevices().then((data) => {
-  //     //   console.log("navigoter data", data);
-  //     // });
+  useEffect(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        video: {
+          //   facingMode: selectedCamera,
+          //  facingMode: { exact: "user" },
+          //   facingMode: { exact: "user" },
+          deviceId: { exact: vid[camIndex] },
+          aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+        },
+      })
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error("Error accessing camera:", error);
+      });
+    // console.log(constraints);
+  }, [selectedCamera,camIndex]);
 
-  //     console.log(constraints);
-
-  //   }, [selectedCamera]);
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      videoRef.current.srcObject = stream;
-    })
-    .catch((error) => {
-      console.error("Error accessing camera:", error);
-    });
+  console.log(constraints);
   return (
     <div className="camera-app">
       <div className="camera-controls">
