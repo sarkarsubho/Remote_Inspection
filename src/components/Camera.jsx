@@ -82,7 +82,8 @@ const Camera = () => {
   const constraints = {
     video: {
       //   facingMode: selectedCamera,
-      facingMode: "environment",
+      //   facingMode:,
+      facingMode: { exact: "environment" },
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
   };
