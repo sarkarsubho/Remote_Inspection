@@ -82,7 +82,7 @@ const Camera = () => {
   const constraints = {
     video: {
       //   facingMode: selectedCamera,
-      facingMode: selectedCamera,
+      facingMode: "environment",
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
   };
@@ -92,9 +92,11 @@ const Camera = () => {
   };
 
   useEffect(() => {
-    navigator.mediaDevices.enumerateDevices().then((data) => {
-      console.log("navigoter data", data);
-    });
+    // navigator.mediaDevices.enumerateDevices().then((data) => {
+    //   console.log("navigoter data", data);
+    // });
+
+    console.log(constraints);
     navigator.mediaDevices
       .getUserMedia(constraints)
       .then((stream) => {
