@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 const Camera = () => {
@@ -82,7 +82,7 @@ const Camera = () => {
   const constraints = {
     video: {
       //   facingMode: selectedCamera,
-      facingMode: { exact: selectedCamera },
+      facingMode: selectedCamera,
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
   };
@@ -91,17 +91,19 @@ const Camera = () => {
     setImages((prev) => prev.filter((e) => e._id !== id));
   };
 
-  navigator.mediaDevices.enumerateDevices().then((data) => {
-    console.log("navigoter data", data);
-  });
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      videoRef.current.srcObject = stream;
-    })
-    .catch((error) => {
-      console.error("Error accessing camera:", error);
+  useEffect(() => {
+    navigator.mediaDevices.enumerateDevices().then((data) => {
+      console.log("navigoter data", data);
     });
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error("Error accessing camera:", error);
+      });
+  }, [selectedCamera]);
 
   return (
     <div className="camera-app">
