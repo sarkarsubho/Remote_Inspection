@@ -52,7 +52,7 @@ const Camera = () => {
   //       </div>
   //     </div>
   //   );
-  const [selectedCamera, setSelectedCamera] = useState("front");
+  const [selectedCamera, setSelectedCamera] = useState("user");
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const videoRef = useRef({});
   const canvasRef = useRef(null);
@@ -60,12 +60,13 @@ const Camera = () => {
   const [images, setImages] = useState([]);
 
   const handleCameraToggle = () => {
-    setSelectedCamera(selectedCamera === "front" ? "back" : "front");
+    setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
   };
 
   const handleAspectRatioChange = (newAspectRatio) => {
     setAspectRatio(newAspectRatio);
   };
+
 
   const handleCaptureImage = () => {
     const canvas = canvasRef.current;
@@ -90,6 +91,9 @@ const Camera = () => {
     setImages((prev) => prev.filter((e) => e._id !== id));
   };
 
+  navigator.mediaDevices.enumerateDevices().then((data) => {
+    console.log("navigoter data", data);
+  });
   navigator.mediaDevices
     .getUserMedia(constraints)
     .then((stream) => {
@@ -129,7 +133,7 @@ const Camera = () => {
             return (
               <div key={_id}>
                 <img src={url} alt="captured images"></img>
-                <button onClick={()=>handleDelete(_id)}>delete</button>
+                <button onClick={() => handleDelete(_id)}>delete</button>
               </div>
             );
           })}
