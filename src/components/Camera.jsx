@@ -82,7 +82,7 @@ const Camera = () => {
   const constraints = {
     video: {
       //   facingMode: selectedCamera,
-      //   facingMode:,
+        //  facingMode: { exact: "user" },
       facingMode: { exact: "environment" },
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
@@ -92,22 +92,22 @@ const Camera = () => {
     setImages((prev) => prev.filter((e) => e._id !== id));
   };
 
-  useEffect(() => {
-    // navigator.mediaDevices.enumerateDevices().then((data) => {
-    //   console.log("navigoter data", data);
-    // });
+  //   useEffect(() => {
+  //     // navigator.mediaDevices.enumerateDevices().then((data) => {
+  //     //   console.log("navigoter data", data);
+  //     // });
 
-    console.log(constraints);
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream) => {
-        videoRef.current.srcObject = stream;
-      })
-      .catch((error) => {
-        console.error("Error accessing camera:", error);
-      });
-  }, [selectedCamera]);
+  //     console.log(constraints);
 
+  //   }, [selectedCamera]);
+  navigator.mediaDevices
+    .getUserMedia(constraints)
+    .then((stream) => {
+      videoRef.current.srcObject = stream;
+    })
+    .catch((error) => {
+      console.error("Error accessing camera:", error);
+    });
   return (
     <div className="camera-app">
       <div className="camera-controls">
