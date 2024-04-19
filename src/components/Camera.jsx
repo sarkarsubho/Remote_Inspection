@@ -67,7 +67,6 @@ const Camera = () => {
     setAspectRatio(newAspectRatio);
   };
 
-
   const handleCaptureImage = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -82,7 +81,7 @@ const Camera = () => {
 
   const constraints = {
     video: {
-      facingMode: selectedCamera,
+      facingMode: { exact: "environment" },
       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
     },
   };
