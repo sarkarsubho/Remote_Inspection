@@ -129,6 +129,9 @@ const Camera = () => {
   console.log(constraints);
   return (
     <div className="camera-app">
+        <div>
+            {vid} -------- index{index}
+        </div>
       <div className="camera-controls">
         <button onClick={handleCameraToggle}>Toggle Camera</button>
         <div>
