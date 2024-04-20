@@ -4,8 +4,10 @@ const CameraComponent = () => {
   const [mediaStream, setMediaStream] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const videoRef = useRef(null);
+  const [getCamErr, setGetCamErr] = useState(false);
 
   const startCamera = async (fm = "user") => {
+    setGetCamErr(false);
     if (mediaStream) {
       mediaStream.getTracks().forEach((track) => track.stop());
       setMediaStream(null);
@@ -18,6 +20,7 @@ const CameraComponent = () => {
       videoRef.current.srcObject = stream;
     } catch (error) {
       console.error("Error accessing camera:", error);
+      setGetCamErr(true);
     }
   };
 
@@ -51,12 +54,17 @@ const CameraComponent = () => {
 
   return (
     <div>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        style={{ overflow: "hidden", height: "500px", width: "500px" }}
-      />
+      {getCamErr ? (
+        <h3>Camera not Found !</h3>
+      ) : (
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          style={{ overflow: "hidden", height: "500px", width: "500px" }}
+        />
+      )}
+
       <div style={{ zIndex: 10 }}>
         <button onClick={startCamera}>Start Camera</button>
         <button onClick={stopCamera}>Stop Camera</button>

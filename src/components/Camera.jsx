@@ -55,96 +55,33 @@ const Camera = () => {
   //   );
   let vid = [];
   // -------------------------------------------------------------------------------------
-  //   async function getCams() {
-  //     await navigator.mediaDevices.enumerateDevices().then((data) => {
-  //       let deviceIds = data
-  //         .filter((e) => e.kind === "videoinput")
-  //         .map((e) => vid.push(e.deviceId));
+  async function getCams() {
+    await navigator.mediaDevices.enumerateDevices().then((data) => {
+      let deviceIds = data
+        .filter((e) => e.kind === "videoinput")
+        .map((e) => vid.push(e.deviceId));
 
-  //       console.log("navigoter data", vid);
-  //     });
-  //   }
+      console.log("navigoter data", vid);
+    });
+  }
 
-  //   const [openBackCamera, setOpenBackCamera] = useState(false);
-  //   let [camIndex, setCamIndex] = useState(0);
+  const [openBackCamera, setOpenBackCamera] = useState(false);
+  let [camIndex, setCamIndex] = useState(0);
 
-  // //   let [cams] = useGetCams();
-  // //   console.log("hookcams", cams);
+  //   let [cams] = useGetCams();
+  //   console.log("hookcams", cams);
 
-  //   const [selectedCamera, setSelectedCamera] = useState("user"); // environment
-  //   const [aspectRatio, setAspectRatio] = useState("16:9");
-  //   const videoRef = useRef({});
-  //   const canvasRef = useRef(null);
-
-  //   const [images, setImages] = useState([]);
-
-  //   const handleCameraToggle = () => {
-  //     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
-
-  //     setCamIndex((index + 1) % vid.length);
-  //   };
-
-  //   const handleAspectRatioChange = (newAspectRatio) => {
-  //     setAspectRatio(newAspectRatio);
-  //   };
-
-  //   const handleCaptureImage = () => {
-  //     const canvas = canvasRef.current;
-  //     const video = videoRef.current;
-  //     canvas.width = video.videoWidth;
-  //     canvas.height = video.videoHeight;
-  //     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
-  //     const imageDataUrl = canvas.toDataURL("image/jpeg");
-  //     // Here you can handle the captured image data, such as saving it or displaying it in a gallery
-
-  //     // console.log("Captured image:", imageDataUrl);
-  //     setImages((prev) => [...prev, { _id: uuidv4(), url: imageDataUrl }]);
-  //   };
-
-  //   const constraints = {
-  //     video: {
-  //       //   facingMode: selectedCamera,
-  //       //  facingMode: { exact: "user" },
-  //       //   facingMode: { exact: "user" },
-  //       aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
-  //     },
-  //   };
-
-  //   const handleDelete = (id) => {
-  //     setImages((prev) => prev.filter((e) => e._id !== id));
-  //   };
-
-  //   useEffect(() => {
-  //     getCams();
-  //     console.log("camIndex", vid[camIndex]);
-  //     navigator.mediaDevices
-  //       .getUserMedia({
-  //         video: {
-  //           //   facingMode: selectedCamera,
-  //           //  facingMode: { exact: "user" },
-  //           //   facingMode: { exact: "user" },
-  //           deviceId: { exact: vid[camIndex] },
-  //           aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
-  //         },
-  //       })
-  //       .then((stream) => {
-  //         videoRef.current.srcObject = stream;
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error accessing camera:", error);
-  //       });
-  //     // console.log(constraints);
-  //   }, [selectedCamera, camIndex]);
-
-  //   console.log(constraints);
-
-  const [selectedCamera, setSelectedCamera] = useState("user"); // 'user' for front camera, 'environment' for back camera
+  const [selectedCamera, setSelectedCamera] = useState("user"); // environment
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const videoRef = useRef({});
   const canvasRef = useRef(null);
 
+  const [images, setImages] = useState([]);
+
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
+
+    setCamIndex((index + 1) % vid.length);
   };
 
   const handleAspectRatioChange = (newAspectRatio) => {
@@ -159,7 +96,9 @@ const Camera = () => {
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageDataUrl = canvas.toDataURL("image/jpeg");
     // Here you can handle the captured image data, such as saving it or displaying it in a gallery
-    console.log("Captured image:", imageDataUrl);
+
+    // console.log("Captured image:", imageDataUrl);
+    setImages((prev) => [...prev, { _id: uuidv4(), url: imageDataUrl }]);
   };
 
   const constraints = {
@@ -169,38 +108,90 @@ const Camera = () => {
     },
   };
 
+  const handleDelete = (id) => {
+    setImages((prev) => prev.filter((e) => e._id !== id));
+  };
+
   useEffect(() => {
-    if (selectedCamera === "user") {
-      navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            facingMode: "user",
-            aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
-          },
-        })
-        .then((stream) => {
-          videoRef.current.srcObject = stream;
-        })
-        .catch((error) => {
-          console.error("Error accessing camera:", error);
-        });
-    } else {
-      console.log("getting environment variable");
-      navigator.mediaDevices
-        .getUserMedia({
-          video: {
-            facingMode: "environment",
-            aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
-          },
-        })
-        .then((stream) => {
-          videoRef.current.srcObject = stream;
-        })
-        .catch((error) => {
-          console.error("Error accessing camera:", error);
-        });
-    }
-  }, [selectedCamera]);
+    getCams();
+    console.log("camIndex", vid[camIndex]);
+    navigator.mediaDevices
+      .getUserMedia(constraints)
+      .then((stream) => {
+        videoRef.current.srcObject = stream;
+      })
+      .catch((error) => {
+        console.error("Error accessing camera:", error);
+      });
+    // console.log(constraints);
+  }, [selectedCamera, camIndex]);
+
+  console.log(constraints);
+  // ----------------------
+
+  // const [selectedCamera, setSelectedCamera] = useState("user"); // 'user' for front camera, 'environment' for back camera
+  // const [aspectRatio, setAspectRatio] = useState("16:9");
+  // const videoRef = useRef({});
+  // const canvasRef = useRef(null);
+
+  // const handleCameraToggle = () => {
+  //   setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
+  // };
+
+  // const handleAspectRatioChange = (newAspectRatio) => {
+  //   setAspectRatio(newAspectRatio);
+  // };
+
+  // const handleCaptureImage = () => {
+  //   const canvas = canvasRef.current;
+  //   const video = videoRef.current;
+  //   canvas.width = video.videoWidth;
+  //   canvas.height = video.videoHeight;
+  //   canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
+  //   const imageDataUrl = canvas.toDataURL("image/jpeg");
+  //   // Here you can handle the captured image data, such as saving it or displaying it in a gallery
+  //   console.log("Captured image:", imageDataUrl);
+  // };
+
+  // const constraints = {
+  //   video: {
+  //     facingMode: selectedCamera,
+  //     aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+  //   },
+  // };
+
+  // useEffect(() => {
+  //   if (selectedCamera === "user") {
+  //     navigator.mediaDevices
+  //       .getUserMedia({
+  //         video: {
+  //           facingMode: "user",
+  //           aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+  //         },
+  //       })
+  //       .then((stream) => {
+  //         videoRef.current.srcObject = stream;
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error accessing camera:", error);
+  //       });
+  //   } else {
+  //     console.log("getting environment variable");
+  //     navigator.mediaDevices
+  //       .getUserMedia({
+  //         video: {
+  //           facingMode: "environment",
+  //           aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+  //         },
+  //       })
+  //       .then((stream) => {
+  //         videoRef.current.srcObject = stream;
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error accessing camera:", error);
+  //       });
+  //   }
+  // }, [selectedCamera]);
 
   return (
     <div className="camera-app" style={{ width: "100vw" }}>
@@ -233,7 +224,7 @@ const Camera = () => {
       <div>
         <h1>Captured Images</h1>
 
-        {/* <div>
+        <div>
           {images.map(({ _id, url }) => {
             return (
               <div key={_id}>
@@ -242,7 +233,7 @@ const Camera = () => {
               </div>
             );
           })}
-        </div> */}
+        </div>
       </div>
     </div>
   );
