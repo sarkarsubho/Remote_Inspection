@@ -5,8 +5,13 @@ const CameraApp = () => {
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const [zoomLevel, setZoomLevel] = useState(1);
   const [key, setKey] = useState(0);
+
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
+
+  const rearVideoRef = useRef(null);
+  const rearCanvasRef = useRef(null);
+  const [rearCamError, setRearCamError] = useState(false);
 
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
@@ -36,6 +41,36 @@ const CameraApp = () => {
     setZoomLevel((prevZoom) => Math.max(0.1, prevZoom - 0.1));
   };
 
+  async function getRearMedia(v) {
+    let stream = null;
+    let constraints = {
+      video: {
+        facingMode: { exact: "environment" },
+        aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+        zoom: zoomLevel,
+      },
+    };
+
+    // if (selectedCamera === "user") {
+    //   constraints.video.facingMode = "user";
+    // } else {
+    //   constraints.video.facingMode = { exact: "environment" };
+    // }
+
+    console.log(constraints);
+
+    try {
+      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      //  stream = stream.json();
+      rearVideoRef.current.srcObject = stream;
+      /* use the stream */
+    } catch (err) {
+      /* handle the error */
+      console.error("camera error", err);
+      console.log(err);
+      setRearCamError(true);
+    }
+  }
   async function getMedia(v) {
     let stream = null;
     let constraints = {
@@ -48,7 +83,7 @@ const CameraApp = () => {
     if (selectedCamera === "user") {
       constraints.video.facingMode = "user";
     } else {
-      constraints.video.facingMode = "environment" ;
+      constraints.video.facingMode = { exact: "environment" };
     }
 
     console.log(constraints);
@@ -60,7 +95,8 @@ const CameraApp = () => {
       /* use the stream */
     } catch (err) {
       /* handle the error */
-      console.error("camera error", err.message);
+      console.error("camera error", err);
+      console.log(err);
     }
   }
 
@@ -75,6 +111,7 @@ const CameraApp = () => {
   console.log(selectedCamera);
   useEffect(() => {
     getMedia();
+    getRearMedia();
     // return async() => (videoRef.current = {});
   }, [selectedCamera]);
   return (
@@ -110,13 +147,27 @@ const CameraApp = () => {
       </div>
       <div className="camera-view" style={{ overflow: "hidden" }}>
         <video
-        key={key}
+          key={key}
           ref={videoRef}
           autoPlay
           playsInline
           style={{ transform: `scale(${1 / zoomLevel})` }}
         />
         <canvas ref={canvasRef} style={{ display: "none" }} />
+        {rearCamError ? (
+          <h3>Camera not Found !</h3>
+        ) : (
+          <>
+            <video
+              // key={key}
+              ref={rearVideoRef}
+              autoPlay
+              playsInline
+              style={{ transform: `scale(${1 / zoomLevel})` }}
+            />
+            <canvas ref={rearCanvasRef} style={{ display: "none" }} />
+          </>
+        )}
       </div>
     </div>
   );
