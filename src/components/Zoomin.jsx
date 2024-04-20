@@ -4,11 +4,13 @@ const CameraApp = () => {
   const [selectedCamera, setSelectedCamera] = useState("user"); // 'user' for front camera, 'environment' for back camera
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [key, setKey] = useState(0);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
 
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
+    setKey((prevKey) => prevKey + 1);
   };
 
   const handleAspectRatioChange = (newAspectRatio) => {
@@ -44,7 +46,7 @@ const CameraApp = () => {
     };
 
     if (selectedCamera === "user") {
-      constraints.video.facingMode = { exact: "environment" };
+      constraints.video.facingMode = "user";
     } else {
       constraints.video.facingMode = { exact: "environment" };
     }
@@ -53,12 +55,12 @@ const CameraApp = () => {
 
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
-    //  stream = stream.json();
+      //  stream = stream.json();
       videoRef.current.srcObject = stream;
       /* use the stream */
     } catch (err) {
       /* handle the error */
-      console.error("camera error",err.message);
+      console.error("camera error", err.message);
     }
   }
 
@@ -71,13 +73,14 @@ const CameraApp = () => {
   //       console.error("Error accessing camera:", error);
   //     });
   console.log(selectedCamera);
-  useEffect(()=>{
-    getMedia()
-
-  },[selectedCamera])
+  useEffect(() => {
+    getMedia();
+    // return async() => (videoRef.current = {});
+  }, [selectedCamera]);
   return (
     <div className="camera-app">
       <div className="camera-controls">
+        <h3>{selectedCamera}</h3>
         <button onClick={handleCameraToggle}>Toggle Camera</button>
         <div>
           <label htmlFor="aspectRatio">Aspect Ratio:</label>
@@ -107,6 +110,7 @@ const CameraApp = () => {
       </div>
       <div className="camera-view" style={{ overflow: "hidden" }}>
         <video
+        key={key}
           ref={videoRef}
           autoPlay
           playsInline
