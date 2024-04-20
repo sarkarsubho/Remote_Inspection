@@ -6,11 +6,11 @@ const CameraApp = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const [key, setKey] = useState(0);
 
-  const videoRef = useRef(null);
-  const canvasRef = useRef(null);
+  const videoRef = useRef({});
+  const canvasRef = useRef({});
 
-  const rearVideoRef = useRef(null);
-  const rearCanvasRef = useRef(null);
+  const rearVideoRef = useRef({});
+  const rearCanvasRef = useRef({});
   const [rearCamError, setRearCamError] = useState(false);
 
   const handleCameraToggle = () => {
@@ -66,7 +66,7 @@ const CameraApp = () => {
       /* use the stream */
     } catch (err) {
       /* handle the error */
-      console.error("camera error", err);
+      console.error("rear camera error", err);
       console.log(err);
       setRearCamError(true);
     }
@@ -110,8 +110,8 @@ const CameraApp = () => {
   //     });
   console.log(selectedCamera);
   useEffect(() => {
-    getMedia();
-    getRearMedia();
+    selectedCamera === "user" && getMedia();
+    selectedCamera !== "user" && getRearMedia();
     // return async() => (videoRef.current = {});
   }, [selectedCamera]);
   return (
