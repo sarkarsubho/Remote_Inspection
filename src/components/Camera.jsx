@@ -169,17 +169,41 @@ const Camera = () => {
     },
   };
 
-  navigator.mediaDevices
-    .getUserMedia(constraints)
-    .then((stream) => {
-      videoRef.current.srcObject = stream;
-    })
-    .catch((error) => {
-      console.error("Error accessing camera:", error);
-    });
+  useEffect(() => {
+    if (selectedCamera === "user") {
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            facingMode: { exact: "user" },
+            aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+          },
+        })
+        .then((stream) => {
+          videoRef.current.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error("Error accessing camera:", error);
+        });
+    } else {
+      console.log("getting environment variable");
+      navigator.mediaDevices
+        .getUserMedia({
+          video: {
+            facingMode: { exact: "environment" },
+            aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+          },
+        })
+        .then((stream) => {
+          videoRef.current.srcObject = stream;
+        })
+        .catch((error) => {
+          console.error("Error accessing camera:", error);
+        });
+    }
+  }, [selectedCamera]);
 
   return (
-    <div className="camera-app" style={{width:"100vw"}}>
+    <div className="camera-app" style={{ width: "100vw" }}>
       <div>
         {/* {vid.map((e) => (
           <p>{e}</p>
