@@ -83,7 +83,7 @@ const CameraApp = () => {
     // if (selectedCamera === "user") {
     //   constraints.video.facingMode = "user";
     // } else {
-    constraints.video.facingMode = { exact: "environment" };
+    constraints.video.facingMode = { exact: "user" };
     // }
 
     console.log(constraints);
@@ -112,7 +112,7 @@ const CameraApp = () => {
   useEffect(() => {
     selectedCamera === "user" && getMedia();
     selectedCamera !== "user" && getRearMedia();
-    // return async() => (videoRef.current = {});
+    return async() => (videoRef.current = {});
   }, [selectedCamera]);
   return (
     <div className="camera-app">
