@@ -174,7 +174,7 @@ const Camera = () => {
       navigator.mediaDevices
         .getUserMedia({
           video: {
-            facingMode: { exact: "environment" },
+            facingMode: "user",
             aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
           },
         })
@@ -189,7 +189,7 @@ const Camera = () => {
       navigator.mediaDevices
         .getUserMedia({
           video: {
-            facingMode: { exact: "environment" },
+            facingMode: "environment",
             aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
           },
         })
