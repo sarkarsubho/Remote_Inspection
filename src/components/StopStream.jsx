@@ -5,10 +5,10 @@ const CameraComponent = () => {
   const [zoomLevel, setZoomLevel] = useState(1);
   const videoRef = useRef(null);
 
-  const startCamera = async () => {
+  const startCamera = async ( fm="user") => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: "environment" },
+        video: { facingMode: fm },
       });
       setMediaStream(stream);
       videoRef.current.srcObject = stream;
@@ -22,6 +22,7 @@ const CameraComponent = () => {
       mediaStream.getTracks().forEach((track) => track.stop());
       setMediaStream(null);
     }
+    startCamera({exact:"environment"})
   };
 
   const captureImage = () => {
