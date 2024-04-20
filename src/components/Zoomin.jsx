@@ -44,19 +44,21 @@ const CameraApp = () => {
     };
 
     if (selectedCamera === "user") {
-      constraints.video.facingMode = "user";
+      constraints.video.facingMode = { exact: "environment" };
     } else {
       constraints.video.facingMode = { exact: "environment" };
     }
 
+    console.log(constraints);
+
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
-
+    //  stream = stream.json();
       videoRef.current.srcObject = stream;
       /* use the stream */
     } catch (err) {
       /* handle the error */
-      console.log("camera error",err);
+      console.error("camera error",err.message);
     }
   }
 
