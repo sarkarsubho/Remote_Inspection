@@ -3,10 +3,9 @@ import { v4 as uuidv4 } from "uuid";
 import { useGetCams } from "../hooks/hooks";
 
 const Camera = () => {
-  const [openBackCamera, setOpenBackCamera] = useState(false);
   const [mediaStream, setMediaStream] = useState(null);
   let [camIndex, setCamIndex] = useState(0);
-  const [selectedCamera, setSelectedCamera] = useState("user"); // environment
+  const [selectedCamera, setSelectedCamera] = useState(""); // environment
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -15,16 +14,22 @@ const Camera = () => {
 
   const [getCamErr, setGetCamErr] = useState(false);
 
-  const startCamera = async (fm = "user") => {
+  const getCamera = async (fm) => {
     setGetCamErr(false);
+
     if (mediaStream) {
       mediaStream.getTracks().forEach((track) => track.stop());
       setMediaStream(null);
     }
+
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: fm },
-      });
+      let constraints = {
+        video: {
+          facingMode: fm,
+          aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
+        },
+      };
+      const stream = await navigator.mediaDevices.getUserMedia(constraints);
       setMediaStream(stream);
       videoRef.current.srcObject = stream;
     } catch (error) {
@@ -33,12 +38,16 @@ const Camera = () => {
     }
   };
 
-  const stopCamera = () => {
-    if (mediaStream) {
-      mediaStream.getTracks().forEach((track) => track.stop());
-      setMediaStream(null);
-    }
-    startCamera({ exact: "environment" });
+  const openFrontCam = () => {
+    getCamera("user");
+  };
+
+  const openBackCam = () => {
+    // if (mediaStream) {
+    //   mediaStream.getTracks().forEach((track) => track.stop());
+    //   setMediaStream(null);
+    // }
+    getCamera({ exact: "environment" });
   };
 
   const handleCameraToggle = () => {
@@ -64,32 +73,26 @@ const Camera = () => {
     setImages((prev) => [...prev, { _id: uuidv4(), url: imageDataUrl }]);
   };
 
-  const constraints = {
-    video: {
-      facingMode: selectedCamera,
-      aspectRatio: { ideal: eval(aspectRatio.replace(":", "/")) },
-    },
-  };
-
   const handleDelete = (id) => {
     setImages((prev) => prev.filter((e) => e._id !== id));
   };
 
   useEffect(() => {
-    // getCams();
-    // console.log("camIndex", vid[camIndex]);
-    navigator.mediaDevices
-      .getUserMedia(constraints)
-      .then((stream) => {
-        videoRef.current.srcObject = stream;
-      })
-      .catch((error) => {
-        console.error("Error accessing camera:", error);
-      });
+    selectedCamera === "user" && openFrontCam();
+    selectedCamera === "environment" && openBackCam();
+
+    // navigator.mediaDevices
+    //   .getUserMedia(constraints)
+    //   .then((stream) => {
+    //     videoRef.current.srcObject = stream;
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error accessing camera:", error);
+    //   });
     // console.log(constraints);
   }, [selectedCamera, camIndex, aspectRatio]);
 
-  console.log(constraints);
+  // console.log(constraints);
   // // ----------------------
 
   return (
@@ -121,8 +124,12 @@ const Camera = () => {
       </div>
 
       <div>
-        <button onClick={startCamera}>Open Front Camera</button>
-        <button onClick={stopCamera}>Open Back Camera</button>
+        <button onClick={() => setSelectedCamera("user")}>
+          Open Front Camera
+        </button>
+        <button onClick={() => setSelectedCamera("environment")}>
+          Open Back Camera
+        </button>
       </div>
 
       <div>
