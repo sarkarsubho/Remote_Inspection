@@ -48,7 +48,7 @@ const CameraApp = () => {
     if (selectedCamera === "user") {
       constraints.video.facingMode = "user";
     } else {
-      constraints.video.facingMode = { exact: "environment" };
+      constraints.video.facingMode = "environment" ;
     }
 
     console.log(constraints);
