@@ -80,11 +80,11 @@ const CameraApp = () => {
       },
     };
 
-    if (selectedCamera === "user") {
-      constraints.video.facingMode = "user";
-    } else {
-      constraints.video.facingMode = { exact: "environment" };
-    }
+    // if (selectedCamera === "user") {
+    //   constraints.video.facingMode = "user";
+    // } else {
+    constraints.video.facingMode = { exact: "environment" };
+    // }
 
     console.log(constraints);
 
