@@ -11,9 +11,9 @@ function App() {
 
   return (
     <>
-      <Camera />
+      {/* <Camera /> */}
       {/* <CameraApp/> */}
-      {/* <CameraComponent/> */}
+      <CameraComponent/>
     </>
   );
 }
