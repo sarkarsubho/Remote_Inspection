@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 
 const CameraApp = () => {
   const [selectedCamera, setSelectedCamera] = useState("user"); // 'user' for front camera, 'environment' for back camera
+  const [mediaStream, setMediaStream] = useState(null);
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const [zoomLevel, setZoomLevel] = useState(1);
   const [key, setKey] = useState(0);
@@ -12,6 +13,14 @@ const CameraApp = () => {
   const rearVideoRef = useRef({});
   const rearCanvasRef = useRef({});
   const [rearCamError, setRearCamError] = useState(false);
+
+  const stopCamera = () => {
+    console.log("cleanup called");
+    if (mediaStream) {
+      mediaStream.getTracks().forEach((track) => track.stop());
+      setMediaStream(null);
+    }
+  };
 
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
@@ -62,6 +71,7 @@ const CameraApp = () => {
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       //  stream = stream.json();
+      setMediaStream(stream);
       rearVideoRef.current.srcObject = stream;
       /* use the stream */
     } catch (err) {
@@ -81,9 +91,9 @@ const CameraApp = () => {
     };
 
     // if (selectedCamera === "user") {
-    //   constraints.video.facingMode = "user";
+    constraints.video.facingMode = "user";
     // } else {
-    constraints.video.facingMode = { exact: "user" };
+    // constraints.video.facingMode = { exact: "user" };
     // }
 
     console.log(constraints);
@@ -91,7 +101,9 @@ const CameraApp = () => {
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
       //  stream = stream.json();
+      console.log("stream",stream);
       videoRef.current.srcObject = stream;
+      setMediaStream(stream);
       /* use the stream */
     } catch (err) {
       /* handle the error */
@@ -112,7 +124,7 @@ const CameraApp = () => {
   useEffect(() => {
     selectedCamera === "user" && getMedia();
     selectedCamera !== "user" && getRearMedia();
-    return async() => (videoRef.current = {});
+    return () => stopCamera();
   }, [selectedCamera]);
   return (
     <div className="camera-app">

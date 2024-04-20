@@ -4,6 +4,7 @@ import viteLogo from "/vite.svg";
 import "./App.css";
 import Camera from "./components/Camera";
 import CameraApp from "./components/Zoomin";
+import CameraComponent from "./components/StopStream";
 
 function App() {
   const [count, setCount] = useState(0);
@@ -12,6 +13,7 @@ function App() {
     <>
       {/* <Camera /> */}
       <CameraApp/>
+      {/* <CameraComponent/> */}
     </>
   );
 }
