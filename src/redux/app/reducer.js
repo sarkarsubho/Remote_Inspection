@@ -1,17 +1,18 @@
 import * as types from "./actionTypes";
 
-const initialState ={
-    choosedCam : "user",
-    photos:[],
+const initialState = {
+  photos: [],
 };
 
-const appReducer = (state=initialState,{type,payload})=>{
-    switch (type) {
-        case value:
-            
-            break;
-    
-        default:
-            return state;
-    }
-}
+export const appReducer = (state = initialState, { type, payload }) => {
+  switch (type) {
+    case types.ADD_PHOTO:
+      return { ...state, photos: [payload, ...state.photos] };
+    case types.DELETE_PHOTO:
+      let updatedPhotos = state.photos.filter((e) => e._id !== payload);
+      return { ...state, photos: updatedPhotos };
+
+    default:
+      return state;
+  }
+};

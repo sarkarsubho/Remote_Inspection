@@ -2,13 +2,17 @@ import AddIcon from "@mui/icons-material/Add";
 import CameraIcon from "@mui/icons-material/Camera";
 import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
 import RemoveIcon from "@mui/icons-material/Remove";
-import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import { Box, IconButton, Stack, Typography } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
+import { addToAlbum } from "../redux/app/action";
 import "./gallery.css";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const Camera = () => {
+  const dispatch = useDispatch();
+  const { photos } = useSelector((state) => state.app);
+  console.log("photos", photos);
   const [mediaStream, setMediaStream] = useState(null);
   const [selectedCamera, setSelectedCamera] = useState("user"); // environment
   const [aspectRatio, setAspectRatio] = useState("16:9");
@@ -17,8 +21,6 @@ const Camera = () => {
   const canvasDimensionRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
   const [getCamErr, setGetCamErr] = useState(false);
-
-  const [images, setImages] = useState([]);
 
   const getCamera = async (fm) => {
     setGetCamErr(false);
@@ -61,21 +63,6 @@ const Camera = () => {
     setAspectRatio(newAspectRatio);
   };
 
-  function drawImageActualSize() {
-    // Use the intrinsic size of image in CSS pixels for the canvas element
-    canvas.width = this.naturalWidth;
-    canvas.height = this.naturalHeight;
-
-    // Will draw the image as 300x227, ignoring the custom size of 60x45
-    // given in the constructor
-    ctx.drawImage(this, 0, 0);
-
-    // To use the custom size we'll have to specify the scale parameters
-    // using the element's width and height properties - lets draw one
-    // on top in the corner:
-    ctx.drawImage(this, 0, 0, this.width, this.height);
-  }
-
   const handleCaptureImage = () => {
     const canvas = canvasRef.current;
     const video = videoRef.current;
@@ -86,30 +73,20 @@ const Camera = () => {
     canvas.height = video.videoHeight;
 
     // log
-
     // canvas.width = canvasDimension.offsetWidth;
     // canvas.height = canvasDimension.offsetHeight;
     // console.log(canvasDimension.offsetWidth,canvasDimension.offsetHeight,video.videoWidth,video.videoHeight);
 
-    // canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageDataUrl = canvas.toDataURL("image/jpeg");
     // Here capturing the the image in base64 string and added a unique id as for unique identification for
 
-    // const image = new Image(
-    //   canvasDimension.offsetWidth,
-    //   canvasDimension.offsetHeight
-    // ); // Using optional size for image
-    // image.onload = drawImageActualSize;
-
     // console.log("Captured image:", imageDataUrl);
-    //  have to dispatch the images
-    setImages((prev) => [...prev, { _id: uuidv4(), url: imageDataUrl }]);
+   
+    let newPhoto = { _id: uuidv4(), url: imageDataUrl };
+    dispatch(addToAlbum(newPhoto));
   };
 
-  const handleDelete = (id) => {
-    setImages((prev) => prev.filter((e) => e._id !== id));
-  };
   // zoom fnc
 
   const handleZoomChange = (event) => {
@@ -135,8 +112,6 @@ const Camera = () => {
         style={{
           border: "1px solid",
           overflow: "hidden",
-          // background:"red",
-
           margin: "auto",
           position: "relative",
           aspectRatio: aspectRatio.replace(":", "/"),
@@ -156,8 +131,6 @@ const Camera = () => {
               style={{
                 transform: `scale(${zoomLevel})`,
                 width: "100%",
-                // maxHeight: "500px",
-                // aspectRatio: aspectRatio.replace(":", "/"),
               }}
             />
             <canvas
@@ -166,7 +139,6 @@ const Camera = () => {
                 display: "none",
                 width: "100%",
                 height: "100%",
-                // aspectRatio: aspectRatio.replace(":", "/"),
               }}
             />
           </>
@@ -217,31 +189,24 @@ const Camera = () => {
             disabled={getCamErr}
             onClick={handleCaptureImage}
           >
-            <CameraIcon
-            // fontSize="large"
-            // sx={{
-            //   fontSize: "1.5rem",
-            // }}
-            ></CameraIcon>
+            <CameraIcon />
           </IconButton>
 
           <IconButton
             sx={{
               backgroundColor: "lightslategray",
-
               "&:hover": {
                 bgcolor: "green",
               },
             }}
             onClick={handleCameraToggle}
           >
-            <CameraswitchIcon></CameraswitchIcon>
+            <CameraswitchIcon />
           </IconButton>
         </Stack>
       </Box>
 
       <div className="camera-controls">
-        {/* <button onClick={handleCameraToggle}>Toggle Camera</button> */}
         <Stack position={"relative"} direction={"column"}></Stack>
 
         <Box
@@ -271,66 +236,6 @@ const Camera = () => {
             <option value="1:1">1:1</option>
           </select>
         </Box>
-        {/* <button onClick={handleCaptureImage}>Capture Image</button> */}
-      </div>
-
-      {/* <div>
-        <button onClick={() => setSelectedCamera("user")}>
-          Open Front Camera
-        </button>
-        <button onClick={() => setSelectedCamera("environment")}>
-          Open Back Camera
-        </button>
-      </div> */}
-
-      <div>
-        <Typography
-          fontWeight={600}
-          textAlign={"center"}
-          margin={"2rem 0"}
-          fontSize={"2rem"}
-        >
-          Captured Images
-        </Typography>
-
-        <div className="gallery">
-          {images.map(({ _id, url }) => {
-            return (
-              <div key={_id} className="card">
-                <img src={url} alt="captured images"></img>
-                {/* <button onClick={() => handleDelete(_id)}>delete</button> */}
-                <IconButton
-                  sx={{
-                    position: "absolute",
-                    right: 5,
-                    top: 5,
-                    // rotate: "30deg",
-
-                    backgroundColor: "rgba(119,136,153,0.3)",
-
-                    // "&:hover": {
-                    //   bgcolor: "green",
-                    // },
-                  }}
-                  // disabled={getCamErr}
-                  // onClick={handleCaptureImage}
-                  onClick={() => handleDelete(_id)}
-                >
-                  <DeleteForeverIcon
-                    color="error"
-                    fontSize="large"
-                    // sx={{
-                    //   fontSize: "1.5rem",
-                    // }}
-                  ></DeleteForeverIcon>
-                </IconButton>
-                {/* <Button variant="contained" color="error">
-                  <DeleteForeverIcon /> Error
-                </Button> */}
-              </div>
-            );
-          })}
-        </div>
       </div>
     </div>
   );
