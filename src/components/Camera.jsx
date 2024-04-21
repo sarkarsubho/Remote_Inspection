@@ -1,34 +1,24 @@
-import React, { useState, useRef, useEffect } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { useGetCams } from "../hooks/hooks";
-import {
-  Box,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  Typography,
-} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 import CameraIcon from "@mui/icons-material/Camera";
 import CameraswitchIcon from "@mui/icons-material/Cameraswitch";
-import AddIcon from "@mui/icons-material/Add";
 import RemoveIcon from "@mui/icons-material/Remove";
+import { Box, Button, IconButton, Stack, Typography } from "@mui/material";
+import React, { useEffect, useRef, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
+import "./gallery.css";
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
 
 const Camera = () => {
   const [mediaStream, setMediaStream] = useState(null);
-  let [camIndex, setCamIndex] = useState(0);
   const [selectedCamera, setSelectedCamera] = useState("user"); // environment
   const [aspectRatio, setAspectRatio] = useState("16:9");
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const canvasDimensionRef = useRef(null);
   const [zoomLevel, setZoomLevel] = useState(1);
+  const [getCamErr, setGetCamErr] = useState(false);
 
   const [images, setImages] = useState([]);
-
-  const [getCamErr, setGetCamErr] = useState(false);
 
   const getCamera = async (fm) => {
     setGetCamErr(false);
@@ -60,17 +50,11 @@ const Camera = () => {
   };
 
   const openBackCam = () => {
-    // if (mediaStream) {
-    //   mediaStream.getTracks().forEach((track) => track.stop());
-    //   setMediaStream(null);
-    // }
     getCamera({ exact: "environment" });
   };
 
   const handleCameraToggle = () => {
     setSelectedCamera(selectedCamera === "user" ? "environment" : "user");
-
-    // setCamIndex((index + 1) % vid.length);
   };
 
   const handleAspectRatioChange = (newAspectRatio) => {
@@ -107,23 +91,19 @@ const Camera = () => {
     // canvas.height = canvasDimension.offsetHeight;
     // console.log(canvasDimension.offsetWidth,canvasDimension.offsetHeight,video.videoWidth,video.videoHeight);
 
-    // const aspectRatio = video.videoWidth / video.videoHeight;
-    // const canvasWidth = video.videoWidth * zoomLevel;
-    // const canvasHeight = canvasWidth / aspectRatio;
-    // canvas.width = canvasWidth;
-    // canvas.height = canvasHeight;
-
     // canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     canvas.getContext("2d").drawImage(video, 0, 0, canvas.width, canvas.height);
     const imageDataUrl = canvas.toDataURL("image/jpeg");
     // Here capturing the the image in base64 string and added a unique id as for unique identification for
-    const image = new Image(
-      canvasDimension.offsetWidth,
-      canvasDimension.offsetHeight
-    ); // Using optional size for image
-    image.onload = drawImageActualSize;
+
+    // const image = new Image(
+    //   canvasDimension.offsetWidth,
+    //   canvasDimension.offsetHeight
+    // ); // Using optional size for image
+    // image.onload = drawImageActualSize;
 
     // console.log("Captured image:", imageDataUrl);
+    //  have to dispatch the images
     setImages((prev) => [...prev, { _id: uuidv4(), url: imageDataUrl }]);
   };
 
@@ -304,14 +284,49 @@ const Camera = () => {
       </div> */}
 
       <div>
-        <h1>Captured Images</h1>
+        <Typography
+          fontWeight={600}
+          textAlign={"center"}
+          margin={"2rem 0"}
+          fontSize={"2rem"}
+        >
+          Captured Images
+        </Typography>
 
-        <div>
+        <div className="gallery">
           {images.map(({ _id, url }) => {
             return (
-              <div key={_id}>
+              <div key={_id} className="card">
                 <img src={url} alt="captured images"></img>
-                <button onClick={() => handleDelete(_id)}>delete</button>
+                {/* <button onClick={() => handleDelete(_id)}>delete</button> */}
+                <IconButton
+                  sx={{
+                    position: "absolute",
+                    right: 5,
+                    top: 5,
+                    // rotate: "30deg",
+
+                    backgroundColor: "rgba(119,136,153,0.3)",
+
+                    // "&:hover": {
+                    //   bgcolor: "green",
+                    // },
+                  }}
+                  // disabled={getCamErr}
+                  // onClick={handleCaptureImage}
+                  onClick={() => handleDelete(_id)}
+                >
+                  <DeleteForeverIcon
+                    color="error"
+                    fontSize="large"
+                    // sx={{
+                    //   fontSize: "1.5rem",
+                    // }}
+                  ></DeleteForeverIcon>
+                </IconButton>
+                {/* <Button variant="contained" color="error">
+                  <DeleteForeverIcon /> Error
+                </Button> */}
               </div>
             );
           })}
