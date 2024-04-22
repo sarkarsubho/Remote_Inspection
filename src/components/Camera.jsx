@@ -11,8 +11,7 @@ import "./gallery.css";
 
 const Camera = () => {
   const dispatch = useDispatch();
-  const { photos } = useSelector((state) => state.app);
-  console.log("photos", photos);
+
   const [mediaStream, setMediaStream] = useState(null);
   const [selectedCamera, setSelectedCamera] = useState("user"); // environment
   const [aspectRatio, setAspectRatio] = useState("16:9");
@@ -87,7 +86,7 @@ const Camera = () => {
     dispatch(addToAlbum(newPhoto));
   };
 
-  // zoom fnc
+  // zoom fn
 
   const handleZoomChange = (event) => {
     const zoomValue = parseFloat(event.target.value);
